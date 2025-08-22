@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greek University Admissions Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: #6c757d;
+        }
+
+        .nav-tab.active {
+            background: white;
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+        }
+
+        .nav-tab:hover:not(.active) {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .data-table {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
+            color: white;
+            padding: 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .trend-indicator {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .trend-up {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .trend-down {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .highlight-row {
+            background: linear-gradient(90deg, #74b9ff20, transparent);
+            border-left: 4px solid #74b9ff;
+        }
+
+        .city-section {
+            margin-bottom: 40px;
+        }
+
+        .city-title {
+            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .ranking-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            table {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <h1>🎓 Greek University Admissions Dashboard</h1>
+            <p>Comprehensive Analysis | 2021-2025 | 20 Datasets</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('overview')">📊 Overall Trends</button>
+            <button class="nav-tab" onclick="showTab('universities')">🏛️ University Comparison</button>
+            <button class="nav-tab" onclick="showTab('cities')">🏙️ City Analysis</button>
+            <button class="nav-tab" onclick="showTab('rankings')">🏆 National Rankings</button>
+            <button class="nav-tab" onclick="showTab('western-macedonia')">🏔️ Western Macedonia</button>
+            <button class="nav-tab" onclick="showTab('analytics')">📈 Analytics & Charts</button>
+        </div>
+
+        <!-- Overall Trends Tab -->
+        <div id="overview" class="tab-content active">
+            <div class="comparison-grid">
+                <div class="stat-card">
+                    <h3>Total Universities</h3>
+                    <div class="stat-number">347,356</div>
+                    <div class="stat-label">Total Positions (5 years)</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Average Empty Rate</h3>
+                    <div class="stat-number">18.7%</div>
+                    <div class="stat-label">2021-2025 Average</div>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <div class="table-header">📈 Year-by-Year Trends Analysis</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Year</th>
+                            <th>Total Positions</th>
+                            <th>Empty Seats</th>
+                            <th>Empty Rate %</th>
+                            <th>Admitted</th>
+                            <th>Trend</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>2021</strong></td>
+                            <td>75,271</td>
+                            <td>19,146</td>
+                            <td>25.4%</td>
+                            <td>56,125</td>
+                            <td><span class="trend-indicator trend-down">📉 High Empty Rate</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>2022</strong></td>
+                            <td>66,678</td>
+                            <td>11,825</td>
+                            <td>17.7%</td>
+                            <td>54,853</td>
+                            <td><span class="trend-indicator trend-up">📈 Improving</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>2023</strong></td>
+                            <td>67,904</td>
+                            <td>11,733</td>
+                            <td>17.3%</td>
+                            <td>56,171</td>
+                            <td><span class="trend-indicator trend-up">📈 Best Performance</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>2024</strong></td>
+                            <td>68,786</td>
+                            <td>11,159</td>
+                            <td>16.2%</td>
+                            <td>57,627</td>
+                            <td><span class="trend-indicator trend-up">📈 Peak Efficiency</span></td>
+                        </tr>
+                        <tr class="highlight-row">
+                            <td><strong>2025</strong></td>
+                            <td>69,095</td>
+                            <td>11,734</td>
+                            <td>17.0%</td>
+                            <td>57,361</td>
+                            <td><span class="trend-indicator trend-down">📉 Slight Decline</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="data-table">
+                <div class="table-header">🏫 School Type Performance Comparison</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>School Type</th>
+                            <th>Schedule</th>
+                            <th>Empty Rate %</th>
+                            <th>Performance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>EPAL</strong></td>
+                            <td>Day</td>
+                            <td>3.9%</td>
+                            <td><span class="trend-indicator trend-up">🌟 Excellent</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>EPAL</strong></td>
+                            <td>Night</td>
+                            <td>41.4%</td>
+                            <td><span class="trend-indicator trend-down">⚠️ Needs Attention</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>GEN</strong></td>
+                            <td>Day</td>
+                            <td>19.0%</td>
+                            <td><span class="trend-indicator trend-up">✅ Good</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>GEN</strong></td>
+                            <td>Night</td>
+                            <td>91.6%</td>
+                            <td><span class="trend-indicator trend-down">🚨 Critical</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Universities Comparison Tab -->
+        <div id="universities" class="tab-content">
+            <div class="comparison-grid">
+                <div class="stat-card">
+                    <h3>ΠΑΝΕΠΙΣΤΗΜΙΟ ΚΡΗΤΗΣ</h3>
+                    <div class="stat-number">24.0%</div>
+                    <div class="stat-label">Empty Rate</div>
+                </div>
+                <div class="stat-card">
+                    <h3>ΕΛΜΕΠΑ</h3>
+                    <div class="stat-number">21.8%</div>
+                    <div class="stat-label">Empty Rate</div>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <div class="table-header">🏛️ Detailed University Comparison</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>University</th>
+                            <th>Total Positions</th>
+                            <th>Empty Seats</th>
+                            <th>Empty Rate %</th>
+                            <th>Admitted</th>
+                            <th>Performance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="highlight-row">
+                            <td><strong>ΕΛΜΕΠΑ</strong></td>
+                            <td>8,870</td>
+                            <td>1,936</td>
+                            <td>21.8%</td>
+                            <td>6,934</td>
+                            <td><span class="ranking-badge">🥇 Better</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>ΠΑΝΕΠΙΣΤΗΜΙΟ ΚΡΗΤΗΣ</strong></td>
+                            <td>12,811</td>
+                            <td>3,072</td>
+                            <td>24.0%</td>
+                            <td>9,739</td>
+                            <td><span class="ranking-badge">🥈 Good</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="data-table">
+                <div class="table-header">📊 Top Departments with Highest Empty Seats</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>University</th>
+                            <th>Department</th>
+                            <th>Empty Seats</th>
+                            <th>Total Positions</th>
+                            <th>Empty Rate %</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>ΕΛΜΕΠΑ</td>
+                            <td>Διοικητικής Επιστήμης και Τεχνολογίας</td>
+                            <td>178</td>
+                            <td>194</td>
+                            <td>91.8%</td>
+                        </tr>
+                        <tr>
+                            <td>ΕΛΜΕΠΑ</td>
+                            <td>Ηλεκτρολόγων Μηχανικών και Μηχ. Υπολογιστών</td>
+                            <td>160</td>
+                            <td>227</td>
+                            <td>70.5%</td>
+                        </tr>
+                        <tr>
+                            <td>ΠΑΝΕΠΙΣΤΗΜΙΟ ΚΡΗΤΗΣ</td>
+                            <td>Οικονομικών Επιστημών (Ρέθυμνο)</td>
+                            <td>141</td>
+                            <td>226</td>
+                            <td>62.4%</td>
+                        </tr>
+                        <tr>
+                            <td>ΠΑΝΕΠΙΣΤΗΜΙΟ ΚΡΗΤΗΣ</td>
+                            <td>Μαθηματικών και Εφαρμοσμένων Μαθηματικών</td>
+                            <td>138</td>
+                            <td>158</td>
+                            <td>87.3%</td>
+                        </tr>
+                        <tr>
+                            <td>ΕΛΜΕΠΑ</td>
+                            <td>Νοσηλευτικής (Ηράκλειο)</td>
+                            <td>125</td>
+                            <td>150</td>
+                            <td>83.3%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Cities Analysis Tab -->
+        <div id="cities" class="tab-content">
+            <div class="comparison-grid">
+                <div class="stat-card">
+                    <h3>Ηράκλειο</h3>
+                    <div class="stat-number">24.3%</div>
+                    <div class="stat-label">Empty Rate</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Ρέθυμνο</h3>
+                    <div class="stat-number">25.3%</div>
+                    <div class="stat-label">Empty Rate</div>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <div class="table-header">🏙️ City Performance Overview</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>City</th>
+                            <th>Departments</th>
+                            <th>Total Positions</th>
+                            <th>Empty Seats</th>
+                            <th>Empty Rate %</th>
+                            <th>Admitted</th>
+                            <th>Winner</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="highlight-row">
+                            <td><strong>Ηράκλειο</strong></td>
+                            <td>282</td>
+                            <td>10,668</td>
+                            <td>2,588</td>
+                            <td>24.3%</td>
+                            <td>8,080</td>
+                            <td><span class="ranking-badge">🏆 Winner</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Ρέθυμνο</strong></td>
+                            <td>149</td>
+                            <td>8,931</td>
+                            <td>2,263</td>
+                            <td>25.3%</td>
+                            <td>6,668</td>
+                            <td><span class="ranking-badge">🥈 Runner-up</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="city-section">
+                <div class="city-title">📍 ΗΡΑΚΛΕΙΟ - Top Departments by Empty Seats</div>
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>University</th>
+                                <th>Department</th>
+                                <th>Empty Seats</th>
+                                <th>Total</th>
+                                <th>Rate %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>ΕΛΜΕΠΑ</td><td>Ηλεκτρολόγων Μηχανικών και Μηχ. Υπολογιστών</td><td>160</td><td>227</td><td>70.5%</td></tr>
+                            <tr><td>ΕΛΜΕΠΑ</td><td>Ηλεκτρολόγων Μηχανικών και Μηχ. Υπολογιστών</td><td>151</td><td>214</td><td>70.6%</td></tr>
+                            <tr><td>ΠΑΝΕΠΙΣΤΗΜΙΟ ΚΡΗΤΗΣ</td><td>Μαθηματικών και Εφαρμοσμένων Μαθηματικών</td><td>138</td><td>158</td><td>87.3%</td></tr>
+                            <tr><td>ΕΛΜΕΠΑ</td><td>Νοσηλευτικής</td><td>125</td><td>150</td><td>83.3%</td></tr>
+                            <tr><td>ΠΑΝΕΠΙΣΤΗΜΙΟ ΚΡΗΤΗΣ</td><td>Φυσικής</td><td>121</td><td>155</td><td>78.1%</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="city-section">
+                <div class="city-title">📍 ΡΕΘΥΜΝΟ - Top Departments by Empty Seats</div>
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>University</th>
+                                <th>Department</th>
+                                <th>Empty Seats</th>
+                                <th>Total</th>
+                                <th>Rate %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>ΠΑΝΕΠΙΣΤΗΜΙΟ ΚΡΗΤΗΣ</td><td>Οικονομικών Επιστημών</td><td>141</td><td>226</td><td>62.4%</td></tr>
+                            <tr><td>ΠΑΝΕΠΙΣΤΗΜΙΟ ΚΡΗΤΗΣ</td><td>Οικονομικών Επιστημών</td><td>140</td><td>220</td><td>63.6%</td></tr>
+                            <tr><td>ΠΑΝΕΠΙΣΤΗΜΙΟ ΚΡΗΤΗΣ</td><td>Ιστορίας και Αρχαιολογίας</td><td>129</td><td>170</td><td>75.9%</td></tr>
+                            <tr><td>ΠΑΝΕΠΙΣΤΗΜΙΟ ΚΡΗΤΗΣ</td><td>Φιλολογίας</td><td>120</td><td>193</td><td>62.2%</td></tr>
+                            <tr><td>ΠΑΝΕΠΙΣΤΗΜΙΟ ΚΡΗΤΗΣ</td><td>Φιλοσοφίας</td><td>108</td><td>129</td><td>83.7%</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- National Rankings Tab -->
+        <div id="rankings" class="tab-content">
+            <div class="data-table">
+                <div class="table-header">🏆 Comprehensive Greek Universities National Ranking</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>University Group</th>
+                            <th>Universities</th>
+                            <th>Departments</th>
+                            <th>Positions</th>
+                            <th>Empty Seats</th>
+                            <th>Empty %</th>
+                            <th>Admitted</th>
+                            <th>Admit %</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="highlight-row">
+                            <td><strong>🥇 1</strong></td>
+                            <td><strong>ATHENS</strong></td>
+                            <td>9</td>
+                            <td>1,983</td>
+                            <td>87,825</td>
+                            <td>9,633</td>
+                            <td>11.0%</td>
+                            <td>78,192</td>
+                            <td>89.0%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>🥈 2</strong></td>
+                            <td><strong>THESSALONIKI</strong></td>
+                            <td>3</td>
+                            <td>1,299</td>
+                            <td>57,162</td>
+                            <td>9,591</td>
+                            <td>16.8%</td>
+                            <td>47,571</td>
+                            <td>83.2%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>🥉 3</strong></td>
+                            <td><strong>PATRAS</strong></td>
+                            <td>1</td>
+                            <td>515</td>
+                            <td>26,137</td>
+                            <td>5,184</td>
+                            <td>19.8%</td>
+                            <td>20,953</td>
+                            <td>80.2%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>4</strong></td>
+                            <td><strong>CRETE</strong></td>
+                            <td>3</td>
+                            <td>546</td>
+                            <td>25,039</td>
+                            <td>5,813</td>
+                            <td>23.2%</td>
+                            <td>19,226</td>
+                            <td>76.8%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>5</strong></td>
+                            <td><strong>DEMOCRITUS</strong></td>
+                            <td>1</td>
+                            <td>395</td>
+                            <td>22,683</td>
+                            <td>3,846</td>
+                            <td>17.0%</td>
+                            <td>18,837</td>
+                            <td>83.0%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>6</strong></td>
+                            <td><strong>WESTERN MACEDONIA</strong></td>
+                            <td>1</td>
+                            <td>344</td>
+                            <td>20,474</td>
+                            <td>8,143</td>
+                            <td>39.8%</td>
+                            <td>12,331</td>
+                            <td>60.2%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>7</strong></td>
+                            <td><strong>PELOPONNESE</strong></td>
+                            <td>1</td>
+                            <td>398</td>
+                            <td>17,470</td>
+                            <td>2,904</td>
+                            <td>16.6%</td>
+                            <td>14,566</td>
+                            <td>83.4%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>8</strong></td>
+                            <td><strong>AEGEAN</strong></td>
+                            <td>1</td>
+                            <td>304</td>
+                            <td>16,998</td>
+                            <td>5,019</td>
+                            <td>29.5%</td>
+                            <td>11,979</td>
+                            <td>70.5%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="comparison-grid">
+                <div class="stat-card">
+                    <h3>🏆 Best Performer</h3>
+                    <div class="stat-number">ATHENS</div>
+                    <div class="stat-label">89.0% Admission Rate</div>
+                </div>
+                <div class="stat-card">
+                    <h3>📊 Largest Capacity</h3>
+                    <div class="stat-number">87,825</div>
+                    <div class="stat-label">Athens Positions</div>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <div class="table-header">📈 Detailed University Group Analysis</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>University Group</th>
+                            <th>Strengths</th>
+                            <th>Key Metrics</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="highlight-row">
+                            <td><strong>🥇 ATHENS</strong></td>
+                            <td>Market leader in all metrics</td>
+                            <td>87,825 positions (avg 44/dept), 11.0% empty, 89.0% admitted</td>
+                        </tr>
+                        <tr>
+                            <td><strong>🥈 THESSALONIKI</strong></td>
+                            <td>Strong admission rates, good capacity</td>
+                            <td>57,162 positions (avg 44/dept), 16.8% empty, 83.2% admitted</td>
+                        </tr>
+                        <tr>
+                            <td><strong>🥉 PATRAS</strong></td>
+                            <td>Solid single university focus, high dept capacity</td>
+                            <td>26,137 positions (avg 51/dept), 19.8% empty, 80.2% admitted</td>
+                        </tr>
+                        <tr>
+                            <td><strong>4️⃣ CRETE</strong></td>
+                            <td>Multiple universities, regional coverage</td>
+                            <td>25,039 positions (avg 46/dept), 23.2% empty, 76.8% admitted</td>
+                        </tr>
+                        <tr>
+                            <td><strong>5️⃣ DEMOCRITUS</strong></td>
+                            <td>High department capacity, good efficiency</td>
+                            <td>22,683 positions (avg 57/dept), 17.0% empty, 83.0% admitted</td>
+                        </tr>
+                        <tr>
+                            <td><strong>6️⃣ WESTERN MACEDONIA</strong></td>
+                            <td>Largest department capacity, needs optimization</td>
+                            <td>20,474 positions (avg 60/dept), 39.8% empty, 60.2% admitted</td>
+                        </tr>
+                        <tr>
+                            <td><strong>7️⃣ PELOPONNESE</strong></td>
+                            <td>Efficient operations, competitive admission rate</td>
+                            <td>17,470 positions (avg 44/dept), 16.6% empty, 83.4% admitted</td>
+                        </tr>
+                        <tr>
+                            <td><strong>8️⃣ AEGEAN</strong></td>
+                            <td>Specialized focus, island university system</td>
+                            <td>16,998 positions (avg 56/dept), 29.5% empty, 70.5% admitted</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="data-table">
+                <div class="table-header">🎯 Comparative Performance Metrics</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>1st Place</th>
+                            <th>2nd Place</th>
+                            <th>3rd Place</th>
+                            <th>4th Place</th>
+                            <th>5th Place</th>
+                            <th>6th Place</th>
+                            <th>7th Place</th>
+                            <th>8th Place</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Admission Rate</strong></td>
+                            <td>🥇 ATHENS (89.0%)</td>
+                            <td>🥈 PELOPONNESE (83.4%)</td>
+                            <td>🥉 THESSALONIKI (83.2%)</td>
+                            <td>4️⃣ DEMOCRITUS (83.0%)</td>
+                            <td>5️⃣ PATRAS (80.2%)</td>
+                            <td>6️⃣ CRETE (76.8%)</td>
+                            <td>7️⃣ AEGEAN (70.5%)</td>
+                            <td>8️⃣ W.MACEDONIA (60.2%)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Empty Rate (Lower=Better)</strong></td>
+                            <td>🥇 ATHENS (11.0%)</td>
+                            <td>🥈 PELOPONNESE (16.6%)</td>
+                            <td>🥉 THESSALONIKI (16.8%)</td>
+                            <td>4️⃣ DEMOCRITUS (17.0%)</td>
+                            <td>5️⃣ PATRAS (19.8%)</td>
+                            <td>6️⃣ CRETE (23.2%)</td>
+                            <td>7️⃣ AEGEAN (29.5%)</td>
+                            <td>8️⃣ W.MACEDONIA (39.8%)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total Capacity</strong></td>
+                            <td>🥇 ATHENS (87,825)</td>
+                            <td>🥈 THESSALONIKI (57,162)</td>
+                            <td>🥉 PATRAS (26,137)</td>
+                            <td>4️⃣ CRETE (25,039)</td>
+                            <td>5️⃣ DEMOCRITUS (22,683)</td>
+                            <td>6️⃣ W.MACEDONIA (20,474)</td>
+                            <td>7️⃣ PELOPONNESE (17,470)</td>
+                            <td>8️⃣ AEGEAN (16,998)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Number of Departments</strong></td>
+                            <td>🥇 ATHENS (1,983)</td>
+                            <td>🥈 THESSALONIKI (1,299)</td>
+                            <td>🥉 CRETE (546)</td>
+                            <td>4️⃣ PATRAS (515)</td>
+                            <td>5️⃣ PELOPONNESE (398)</td>
+                            <td>6️⃣ DEMOCRITUS (395)</td>
+                            <td>7️⃣ W.MACEDONIA (344)</td>
+                            <td>8️⃣ AEGEAN (304)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Western Macedonia Tab -->
+        <div id="western-macedonia" class="tab-content">
+            <div class="comparison-grid">
+                <div class="stat-card">
+                    <h3>🏔️ Western Macedonia</h3>
+                    <div class="stat-number">5 Cities</div>
+                    <div class="stat-label">Detailed Analysis</div>
+                </div>
+                <div class="stat-card">
+                    <h3>📊 Total Capacity</h3>
+                    <div class="stat-number">20,474</div>
+                    <div class="stat-label">University Positions</div>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <div class="table-header">🏙️ University of Western Macedonia - City Comparison</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>City (Greek)</th>
+                            <th>City (English)</th>
+                            <th>Departments</th>
+                            <th>Positions</th>
+                            <th>Empty Seats</th>
+                            <th>Empty %</th>
+                            <th>Admitted</th>
+                            <th>Admit %</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="highlight-row">
+                            <td><strong>🥇 1</strong></td>
+                            <td><strong>Κοζάνη</strong></td>
+                            <td><strong>KOZANI</strong></td>
+                            <td>146</td>
+                            <td>8,822</td>
+                            <td>4,174</td>
+                            <td>47.3%</td>
+                            <td>4,648</td>
+                            <td>52.7%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>🥈 2</strong></td>
+                            <td><strong>Φλώρινα</strong></td>
+                            <td><strong>FLORINA</strong></td>
+                            <td>56</td>
+                            <td>3,756</td>
+                            <td>804</td>
+                            <td>21.4%</td>
+                            <td>2,952</td>
+                            <td>78.6%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>🥉 3</strong></td>
+                            <td><strong>Καστοριά</strong></td>
+                            <td><strong>KASTORIA</strong></td>
+                            <td>66</td>
+                            <td>3,351</td>
+                            <td>858</td>
+                            <td>25.6%</td>
+                            <td>2,493</td>
+                            <td>74.4%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>4</strong></td>
+                            <td><strong>Γρεβενά</strong></td>
+                            <td><strong>GREVENA</strong></td>
+                            <td>38</td>
+                            <td>3,257</td>
+                            <td>2,181</td>
+                            <td>67.0%</td>
+                            <td>1,076</td>
+                            <td>33.0%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>5</strong></td>
+                            <td><strong>Unknown</strong></td>
+                            <td><strong>UNKNOWN</strong></td>
+                            <td>38</td>
+                            <td>1,288</td>
+                            <td>126</td>
+                            <td>9.8%</td>
+                            <td>1,162</td>
+                            <td>90.2%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="data-table">
+                <div class="table-header">📈 Detailed Performance Analysis by City</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>City</th>
+                            <th>Avg Students/Dept</th>
+                            <th>Performance Level</th>
+                            <th>Key Insights</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="highlight-row">
+                            <td><strong>Κοζάνη (KOZANI)</strong></td>
+                            <td>60 students/dept</td>
+                            <td><span class="trend-indicator trend-down">🚨 Critical</span></td>
+                            <td>Largest campus but highest empty rate - needs intervention</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Φλώρινα (FLORINA)</strong></td>
+                            <td>67 students/dept</td>
+                            <td><span class="trend-indicator trend-up">✅ Good</span></td>
+                            <td>Best performance in admission rate (78.6%)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Καστοριά (KASTORIA)</strong></td>
+                            <td>51 students/dept</td>
+                            <td><span class="trend-indicator trend-up">📊 Average</span></td>
+                            <td>Balanced performance, 74.4% admission rate</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Γρεβενά (GREVENA)</strong></td>
+                            <td>86 students/dept</td>
+                            <td><span class="trend-indicator trend-down">⚠️ Poor</span></td>
+                            <td>Worst performer with 67% empty seats</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Unknown (UNKNOWN)</strong></td>
+                            <td>34 students/dept</td>
+                            <td><span class="trend-indicator trend-up">🌟 Excellent</span></td>
+                            <td>Highest efficiency with 90.2% admission rate</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="data-table">
+                <div class="table-header">🏆 City Performance Rankings</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>1st Place</th>
+                            <th>2nd Place</th>
+                            <th>3rd Place</th>
+                            <th>4th Place</th>
+                            <th>5th Place</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Admission Rate</strong></td>
+                            <td>🥇 Unknown (90.2%)</td>
+                            <td>🥈 Φλώρινα (78.6%)</td>
+                            <td>🥉 Καστοριά (74.4%)</td>
+                            <td>4️⃣ Κοζάνη (52.7%)</td>
+                            <td>5️⃣ Γρεβενά (33.0%)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Empty Rate (Lower=Better)</strong></td>
+                            <td>🥇 Unknown (9.8%)</td>
+                            <td>🥈 Φλώρινα (21.4%)</td>
+                            <td>🥉 Καστοριά (25.6%)</td>
+                            <td>4️⃣ Κοζάνη (47.3%)</td>
+                            <td>5️⃣ Γρεβενά (67.0%)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total Capacity</strong></td>
+                            <td>🥇 Κοζάνη (8,822)</td>
+                            <td>🥈 Φλώρινα (3,756)</td>
+                            <td>🥉 Καστοριά (3,351)</td>
+                            <td>4️⃣ Γρεβενά (3,257)</td>
+                            <td>5️⃣ Unknown (1,288)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Number of Departments</strong></td>
+                            <td>🥇 Κοζάνη (146)</td>
+                            <td>🥈 Καστοριά (66)</td>
+                            <td>🥉 Φλώρινα (56)</td>
+                            <td>4️⃣ Γρεβενά (38)</td>
+                            <td>5️⃣ Unknown (38)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Analytics & Charts Tab -->
+        <div id="analytics" class="tab-content">
+            <div class="comparison-grid">
+                <div class="stat-card">
+                    <h3>📈 Visual Analytics</h3>
+                    <div class="stat-number">2 Sets</div>
+                    <div class="stat-label">Comprehensive Charts</div>
+                </div>
+                <div class="stat-card">
+                    <h3>📊 Data Points</h3>
+                    <div class="stat-number">5 Years</div>
+                    <div class="stat-label">2021-2025 Trends</div>
+                </div>
+            </div>
+
+            <!-- Charts Set 1 -->
+            <div class="data-table">
+                <div class="table-header">📊 Comprehensive Analysis - Charts Set 1</div>
+                <div style="text-align: center; padding: 20px;">
+                    <img src="charts1.png" style="width: 100%; height: auto; max-width: 100%; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" alt="Greek Universities Analysis Charts Set 1">
+                </div>
+            </div>
+
+            <!-- Charts Set 2 -->
+            <div class="data-table">
+                <div class="table-header">📈 Comprehensive Analysis - Charts Set 2</div>
+                <div style="text-align: center; padding: 20px;">
+                    <img src="charts2.png" style="width: 100%; height: auto; max-width: 100%; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" alt="Greek Universities Analysis Charts Set 2">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script>
+        function showTab(tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Remove active class from all nav tabs
+            const navTabs = document.querySelectorAll('.nav-tab');
+            navTabs.forEach(tab => tab.classList.remove('active'));
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked nav tab
+            event.target.classList.add('active');
+        }
+
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effects to stat cards
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px) scale(1.02)';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Add click effect to table rows
+            const tableRows = document.querySelectorAll('tbody tr');
+            tableRows.forEach(row => {
+                row.addEventListener('click', function() {
+                    this.style.backgroundColor = '#e3f2fd';
+                    setTimeout(() => {
+                        this.style.backgroundColor = '';
+                    }, 1000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
